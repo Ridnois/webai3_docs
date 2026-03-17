@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 import { ExternalLink, Menu, X, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -48,6 +49,8 @@ function MobileNav({ open, onClose, currentPath }: MobileNavProps) {
       <div className="absolute top-0 left-0 bottom-0 w-72 bg-[var(--sidebar)] border-r border-[var(--sidebar-border)] overflow-y-auto p-6">
         <div className="flex items-center justify-between mb-6">
           <Link href="/" onClick={onClose} className="flex items-center gap-2">
+            <Image src="/logo-2.svg" alt="WebAI3" width={24} height={24} className="block dark:hidden" />
+            <Image src="/logo-2-dark.svg" alt="WebAI3" width={24} height={24} className="hidden dark:block" />
             <span className="font-bold text-sm text-[var(--foreground)]">WebAI3</span>
             <span className="text-[0.65rem] font-mono font-semibold px-1.5 py-0.5 rounded bg-[var(--muted)] text-[var(--muted-foreground)]">
               DOCS
@@ -107,9 +110,8 @@ export function Header({ currentPath }: HeaderProps) {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-6 h-6 rounded-[5px] bg-[var(--foreground)] flex items-center justify-center">
-              <span className="text-[var(--background)] text-[0.6rem] font-bold leading-none">W3</span>
-            </div>
+            <Image src="/logo-2.svg" alt="WebAI3" width={26} height={26} className="block dark:hidden shrink-0" />
+            <Image src="/logo-2-dark.svg" alt="WebAI3" width={26} height={26} className="hidden dark:block shrink-0" />
             <span className="font-semibold text-[0.9rem] text-[var(--foreground)] hidden sm:block">
               WebAI3
             </span>
