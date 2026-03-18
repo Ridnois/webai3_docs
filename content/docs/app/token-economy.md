@@ -5,189 +5,297 @@ section: Inference App
 order: 3
 ---
 
-## The short version
+## What is this doc?
 
-AIC is the native token of the WebAI3 ecosystem. In the inference app, it does three concrete things for you:
+This isn't a whitepaper. It's a plain-English explanation of what AIC actually does for you inside the WebAI3 inference app — what you get for holding it, why staking it makes financial sense, what happens when you pay with it, and how all of it connects into an economy that's designed to grow with the platform.
 
-1. **Stake it → pay less for every AI request.** Lock AIC in the staking contract and the app automatically charges you a lower rate on every inference — whether you pay in USDC or AIC.
-2. **Use it to pay directly → burn some of it in the process.** When you pay with AIC instead of USDC, a portion of those tokens is destroyed forever. Less supply, same demand — that's good for everyone holding AIC.
-3. **Hold it → get access to better models.** Some of the more capable AI models are gated behind an AIC balance. You don't need to do anything special — just hold AIC in your connected wallet.
+If you bought AIC in the presale and you're wondering what happens after the TGE, this is the answer.
 
-None of this is points, credits, or loyalty tiers in a database. Every benefit is enforced on-chain, in real time, against your actual wallet.
+If you're a developer evaluating whether to build on WebAI3 and thinking about whether AIC matters to you, this is the answer too.
 
 ---
 
-## Why AIC in the first place?
+## The 30-second summary
 
-Without a token, the inference app is a simple vending machine: you put USDC in, you get AI output out. That works fine, but it means every dollar you spend on inference is gone — there's no reason to stay, no incentive to participate in the ecosystem, and no connection between your usage and the protocol's growth.
+AIC gives you three things inside the app:
 
-AIC changes the relationship. When you hold and stake AIC:
+**1. Cheaper AI inference.** Stake AIC and your per-request cost drops automatically — anywhere from 10% to 50% depending on how much you've staked. This applies to every request, forever, without doing anything extra each time.
 
-- Your inference costs go down the longer you stay
-- The tokens you spend on AI requests don't just move to someone else — a portion disappear from existence, which benefits everyone who holds the rest
-- You get access to better models that casual users can't touch
-- You have a say in how the protocol evolves (governance is built into the token)
+**2. Access to better models.** The most capable AI models in the platform — SDXL, large language models, high-quality audio — are only available to people who hold AIC. No AIC, no access, regardless of how much USDC you have.
 
-The goal is a system where **heavy users of the platform are also the people most incentivized to hold and stake the token**, and where the token becomes more valuable precisely because the platform gets used more.
+**3. A reason to pay with the token.** When you pay for inference with AIC instead of USDC, 20% of those tokens are permanently destroyed. That's real deflationary pressure tied directly to platform usage — the more people use the app and pay with AIC, the smaller the total supply gets.
 
----
-
-## How paying for inference works
-
-Every AI request costs a small amount of compute time — measured in seconds. The default rate is `$0.001 per second`. A typical text-to-image request takes about 10 seconds, so it costs roughly **$0.01**.
-
-You can pay in two ways.
-
-### Pay with USDC
-
-USDC is a dollar-pegged stablecoin. You always know exactly what you're paying. Connect your wallet, approve the transaction, and the inference runs. Clean and predictable.
-
-This is the default option and works for anyone, even if they've never heard of AIC.
-
-### Pay with AIC
-
-If you hold AIC, you can choose to pay with it instead. The app calculates the USD cost of your request, converts it to the equivalent amount of AIC at the current market rate, and charges that amount from your wallet.
-
-The difference: **when you pay with AIC, 20% of those tokens are burned on the spot.** They don't go to a treasury, they don't go to anyone — they're permanently removed from the total supply. The remaining 80% goes to the protocol.
-
-This matters because the total supply of AIC is fixed at 1 billion and never increases. Every time someone pays for inference with AIC, the circulating supply shrinks a little. If usage grows, the burn compounds.
+None of this lives in a database as points or credits. Every benefit is read directly from your wallet and the staking contract, on-chain, at the moment you make a request.
 
 ---
 
-## Staking — the main lever
+## Why this matters — the problem it's solving
 
-Staking is the simplest and most direct way to get value from AIC in the app. You lock tokens into the staking contract, and from that moment on, every inference request you make is automatically cheaper.
+Without AIC utility in the app, the token would have no reason to exist beyond the presale. You buy it, you get it at TGE, you sell it. That's the typical lifecycle of tokens without real product integration, and it leads to the same outcome every time: price dumps, nobody holds, the ecosystem never takes off.
 
-### How to stake
+WebAI3 is trying to break that pattern by making AIC genuinely useful inside the product from day one after launch.
 
-1. Go to the Wallet panel inside the app
-2. Choose how much AIC to stake and confirm the transaction
-3. Your tokens move from your wallet to the staking contract — they're still yours, just locked
-4. Every request you make from that point will use your discounted rate automatically
-5. When you want them back, you request unstaking, wait out the cooldown, and withdraw
+Think about what it means for a developer who builds on the WebAI3 API. They're making thousands of inference requests per month. At the base rate, that costs real money. If they stake enough AIC to hit the 50% discount tier, they've cut their infrastructure cost in half — permanently, for as long as they keep the tokens staked. At that point, acquiring AIC isn't a speculative bet, it's a business decision. The token pays for itself in reduced operating costs.
 
-You don't need to do anything special per request. The app reads your staked balance on-chain when you hit the API, and the price you see is already discounted.
+Now think about what that means for the supply side. Every developer staking to reduce costs is locking tokens that would otherwise be circulating. Every user paying with AIC is burning a fifth of what they spend. As the platform grows, both of these forces grow with it. The token economy is designed so that the more useful the platform becomes, the more demand for AIC, and the less of it exists.
 
-### What the discount looks like
+That's the design intention. Whether it plays out depends on adoption — but the mechanics are there.
 
-| AIC staked | Discount | Rate per second | Cost per 10s request |
+---
+
+## How inference payments work
+
+Before getting into AIC specifically, it helps to understand how paying for inference works in general.
+
+Every AI request runs for some number of seconds on a compute GPU. The app charges `$0.001 per second` of that compute time. A typical text-to-image request takes about 10 seconds, so it costs roughly $0.01. A quick text-to-text response might be 3 seconds — $0.003. A high-quality audio generation is closer to 15 seconds — $0.015.
+
+These aren't arbitrary prices. They're set to cover the actual cost of the underlying Replicate inference plus a margin that funds protocol development. You're not paying for storage, bandwidth, or a subscription — just the raw compute you use.
+
+The payment happens on-chain, before the inference runs. This is important: the model doesn't start until your payment is settled. If inference fails after that, the payment is already gone — this is a known tradeoff and the failure is recorded for investigation. But it also means there's no billing cycle, no invoices, no monthly caps. You pay for exactly what you use, in real time.
+
+---
+
+## Paying with USDC
+
+USDC is the default and works for everyone. It's a dollar-pegged stablecoin, so $0.01 is always exactly $0.01. You connect your wallet, see the estimated cost, approve the transaction, and your output appears.
+
+This is the zero-friction path. No AIC required. If you just want to run models without thinking about the token economy, this is all you need to know.
+
+---
+
+## Paying with AIC
+
+If you hold AIC, you have a second option: pay directly with the token instead of USDC.
+
+Here's what happens when you do:
+
+The app knows the USD cost of your request ($0.01, for example). It checks the current AIC/USDC exchange rate and converts that to an AIC amount. If AIC is worth $0.10 each, your $0.01 request costs 0.1 AIC. You approve that transfer from your wallet, and the payment settles on-chain in AIC instead of USDC.
+
+The key difference from USDC is what happens to those tokens after you pay:
+
+- **20% are burned immediately.** Destroyed. Sent to the zero address. Gone from the total supply permanently.
+- **80% go to the protocol treasury.** Used to fund ongoing development, liquidity, and operations.
+
+That 20% burn is the part that matters economically. The total supply of AIC is fixed at 1 billion and can never be increased. Every time someone pays for inference with AIC, the supply decreases. If 1,000 people each spend $10 worth of AIC per month, that's $10,000 * 20% = $2,000 worth of AIC removed from circulation every month. At scale, this is significant.
+
+You're not just spending tokens when you pay with AIC — you're actively making the remaining supply scarcer, which benefits every person still holding the token, including you.
+
+### A note on AIC price volatility
+
+Unlike USDC, AIC's value fluctuates. This means the AIC amount you're charged will vary day to day based on market price. If AIC is worth more, you spend fewer tokens for the same request. If it's worth less, you spend more.
+
+Early on, the exchange rate used in the app will be set by the protocol operator. Once the AIC/USDC liquidity pool is live on a DEX, the app will switch to reading a time-weighted average price (TWAP) from the pool directly — which is more decentralized and manipulation-resistant.
+
+---
+
+## Staking — the most powerful thing you can do with AIC
+
+Staking is where the most direct and immediate value comes from as an app user.
+
+The concept is simple: you lock AIC tokens in a smart contract (the staking contract), and in return, every inference request you make is automatically cheaper. The more you stake, the bigger the discount. The discount applies from the moment you stake until the moment you unstake — no renewal, no claiming, no expiry.
+
+### What the staking tiers look like
+
+| AIC staked | Discount | Rate per second | Cost of a 10s request |
 |---|---|---|---|
-| Nothing | 0% | $0.001000 | $0.0100 |
+| 0 AIC | 0% | $0.001000 | $0.0100 |
 | 1,000 AIC | 10% | $0.000900 | $0.0090 |
 | 10,000 AIC | 20% | $0.000800 | $0.0080 |
 | 50,000 AIC | 35% | $0.000650 | $0.0065 |
 | 200,000 AIC | 50% | $0.000500 | $0.0050 |
 
-Half price. That's a real, permanent reduction that applies to every single request for as long as your tokens are staked.
+The top tier is half price. Permanently. For every single request you make while that AIC is staked.
 
-### Does staking pay off?
+### Does this actually pay off?
 
-It depends how much you use the platform. At 500 inference seconds per month — which isn't a lot for a developer or anyone building on top of the API — here's what the savings look like:
+That depends on how much you use the platform. Here's what the math looks like for a few different usage levels:
 
-| AIC staked | Monthly cost | You save vs unstaked |
+**Casual user — 100 inference seconds per month**
+
+| AIC staked | Monthly cost | Monthly savings |
 |---|---|---|
-| 0 | $0.50 | — |
-| 1,000 | $0.45 | $0.05 |
-| 10,000 | $0.40 | $0.10 |
-| 50,000 | $0.325 | $0.175 |
-| 200,000 | $0.25 | $0.25 |
+| 0 | $0.10 | — |
+| 10,000 | $0.08 | $0.02 |
+| 200,000 | $0.05 | $0.05 |
 
-For an individual running occasional requests, the savings are modest. For a developer making hundreds of requests a day, or an autonomous agent running inference continuously, staking at the top tier literally cuts the operating cost in half.
+At this usage level, staking 200k AIC to save $0.05/month doesn't make financial sense. The savings are real but small.
+
+**Regular user — 1,000 inference seconds per month**
+
+| AIC staked | Monthly cost | Monthly savings | Annual savings |
+|---|---|---|---|
+| 0 | $1.00 | — | — |
+| 1,000 | $0.90 | $0.10 | $1.20 |
+| 10,000 | $0.80 | $0.20 | $2.40 |
+| 50,000 | $0.65 | $0.35 | $4.20 |
+| 200,000 | $0.50 | $0.50 | $6.00 |
+
+**Developer or power user — 50,000 inference seconds per month**
+
+| AIC staked | Monthly cost | Monthly savings | Annual savings |
+|---|---|---|---|
+| 0 | $50.00 | — | — |
+| 1,000 | $45.00 | $5.00 | $60 |
+| 10,000 | $40.00 | $10.00 | $120 |
+| 50,000 | $32.50 | $17.50 | $210 |
+| 200,000 | $25.00 | $25.00 | $300 |
+
+**Heavy API consumer or autonomous agent — 500,000 inference seconds per month**
+
+| AIC staked | Monthly cost | Monthly savings | Annual savings |
+|---|---|---|---|
+| 0 | $500.00 | — | — |
+| 10,000 | $400.00 | $100.00 | $1,200 |
+| 50,000 | $325.00 | $175.00 | $2,100 |
+| 200,000 | $250.00 | $250.00 | $3,000 |
+
+For anyone running inference at scale — developers building products, agents running autonomously, teams processing large batches — the discount at the top tier is worth thousands of dollars a year. At that point, staking AIC isn't a "nice to have" — it's a rational infrastructure decision.
+
+The staked tokens aren't spent either. You get the discount for free in the sense that the AIC stays yours. It's locked, not consumed. You can always unstake and get it back after the cooldown period.
+
+### How staking actually works, step by step
+
+**Staking your tokens:**
+1. Open the Wallet panel in the app
+2. Go to the staking section
+3. Enter how much AIC you want to stake
+4. Confirm the transaction — this sends your AIC to the staking contract on-chain
+5. Your staked balance is now live. The next time you make an inference request, the app reads it and applies your discount
+
+**Using your discount:**
+You don't do anything. The app checks your staked balance automatically on every request. The price you see in the estimate is already your discounted price. You just run your requests as normal.
+
+**Getting your tokens back:**
+1. Open the Wallet panel and go to staking
+2. Request to unstake the amount you want
+3. Wait out the cooldown period (this exists to prevent gaming — you can't stake right before a big batch of requests and immediately unstake after)
+4. After the cooldown, withdraw your AIC back to your wallet
+5. Your discount drops to whatever tier your remaining staked amount earns (or disappears entirely if you unstake everything)
 
 ---
 
 ## Model access tiers
 
-Not all AI models are available to everyone. The more capable models — SDXL, large language models, high-quality audio generation — require AIC to access.
+Separate from pricing, AIC determines which models you can access at all.
 
-| Access level | What you need | What it unlocks |
+The inference platform has three tiers of models. The division roughly follows cost and capability — higher-tier models produce better results but require more compute. The platform uses AIC holdings as the gate, not a monthly subscription.
+
+| Tier | What you need | What you can run |
 |---|---|---|
-| **Free** | Nothing — just a wallet | Base image models, small text models |
-| **Standard** | Hold ≥ 500 AIC in your wallet | Better diffusion models, mid-size LLMs |
-| **Premium** | Stake ≥ 5,000 AIC | SDXL, large LLMs, high-quality audio |
+| **Free** | Just a connected wallet | Base image generation, small text models — good for experimentation |
+| **Standard** | Hold ≥ 500 AIC in your wallet | Mid-range diffusion models, mid-size LLMs — solid quality for most use cases |
+| **Premium** | Stake ≥ 5,000 AIC | SDXL, large language models, high-quality audio — the best the platform offers |
 
-"Hold" means the tokens can just sit in your wallet. "Stake" means they need to be locked in the staking contract.
+A few things worth noting:
 
-If you staked 5,000 AIC to hit Premium, those same tokens are also earning you a 10% discount (you'd be in the 1,000 tier — a bit above it, but the discount applies from whatever tier your staked amount falls into).
+**"Hold" and "stake" are different.** Standard just requires you to have 500 AIC sitting in your wallet — nothing locked, nothing at risk, just held. Premium requires 5,000 AIC actively staked in the staking contract. Staked AIC counts toward both the access tier and the discount tier simultaneously.
 
-The app checks your balance on-chain when you make a request. There's no registration, no approval process — the access is a direct consequence of what's in your wallet.
+**There's no approval or sign-up.** When you make a request for a model, the server checks your wallet balance and staked balance on-chain in real time. If you qualify, you get access. If you don't, you don't. It's automatic and immediate in both directions — acquire enough AIC and access unlocks, sell below the threshold and it locks again.
+
+**The gate is server-side.** The client app will show locks or labels on models you can't access, but that's just UI. The actual enforcement happens on the server — you can't bypass it by manipulating the frontend.
 
 ---
 
-## USDC vs AIC — which should you use?
+## USDC vs AIC — deciding which to use
 
-| | Pay with USDC | Pay with AIC |
+Both payment methods give you the same staking discount. The choice is really about what kind of participant you want to be in the ecosystem.
+
+### If you just want to use the app
+
+Pay with USDC. It's stable, predictable, and requires no extra thought. You know exactly what every request costs before you confirm it. This is the right default for most users.
+
+### If you hold AIC and care about the ecosystem
+
+Pay with AIC. Here's why this is the better choice if you're a long-term holder:
+
+Every time you pay with USDC, USDC goes to the treasury. The AIC in your wallet doesn't change. The total supply of AIC doesn't change.
+
+Every time you pay with AIC, 20% of those tokens are burned. The total supply goes down. You've just made every other AIC token slightly more scarce.
+
+You're going to pay for inference either way. The question is whether that payment also benefits you and every other AIC holder by reducing supply, or whether it just moves stablecoin from your wallet to the treasury without any effect on the token economy.
+
+The practical tradeoff is that AIC's price fluctuates, so you can't predict the exact token amount you'll pay. But if you're a holder who believes in the project, the volatility is something you're already accepting. You might as well get the deflationary benefit while you're at it.
+
+### Side-by-side
+
+| | USDC | AIC |
 |---|---|---|
-| Predictability | Exact dollar amount every time | Amount varies with AIC price |
-| Staking discount | Yes — applies to both | Yes — applies to both |
-| Burn effect | No | 20% of payment destroyed permanently |
-| Best for | Casual use, low frequency | AIC holders who want to reduce net supply and support the ecosystem |
-
-Staking discounts work the same regardless of which token you pay with. The distinction is whether you want to participate in the deflationary mechanic.
-
-If you're a long-term AIC holder, paying with AIC rather than USDC makes sense: you're spending tokens that were always going to be used anyway, and you're taking a small amount of supply off the table in the process.
+| Price predictability | Fixed — always dollar-for-dollar | Variable — depends on AIC/USDC rate |
+| Staking discount | Yes, same tiers | Yes, same tiers |
+| Deflationary effect | None | 20% of payment permanently burned |
+| What happens to payment | Goes to treasury | 80% to treasury, 20% gone forever |
+| Best for | Anyone — simple, no moving parts | AIC holders who use the platform regularly |
 
 ---
 
-## Seeing the full picture
+## The complete journey — from first request to long-term user
 
-Here's how a user who has staked AIC experiences the app from start to finish:
+Here's what the full experience looks like for someone who goes all-in on the AIC economy inside the app.
 
-**First time setup**
+**Day 1 — Getting started**
 
-You connect your wallet and sign in. Nothing about this is different from any Web3 app. Then, from the Wallet panel, you open the staking interface, choose an amount, and confirm the transaction. Your staked balance is now on-chain. Done.
+You've received AIC from the presale. You connect your wallet to the WebAI3 app and sign in. You can already run Free tier models without doing anything else.
 
-**Running a request**
+You stake 5,000 AIC. This takes two minutes: open the Wallet panel, enter the amount, confirm the transaction. Your staked balance goes live on-chain. You now have access to Premium models and a 10% discount (you're at the 1,000+ tier).
 
-You type a prompt or select a model. Before you confirm, the app shows you an estimated cost — this number is already your discounted price, based on your staked balance. You see `$0.0080` instead of `$0.0100` because you staked 10,000 AIC.
+You run a text-to-image request. The app shows you $0.009 instead of $0.010. Small difference, but you didn't have to do anything to get it — it was automatic.
 
-You can choose to pay in USDC or AIC. You click confirm. The payment happens on-chain first. Then the model runs. Your output appears.
+**Week 1 — Exploring the platform**
 
-If you paid with AIC: 20% of those tokens were just burned. The other 80% went to the protocol. The inference record in the app's database logs your staked balance at the time, the discount applied, and the effective rate — you can see this in your request history.
+You run more requests. You try SDXL image generation (Premium tier, available because you staked). The outputs are noticeably better. You try a large language model. You run a few audio generations.
 
-**Getting tokens back**
+You choose to pay some requests with AIC. You see the burn counter in your request history — small amounts each time, but each one is permanent.
 
-When you want to unstake, you request it from the Wallet panel. After a cooldown period, you can withdraw your AIC back to your wallet. Your discount drops back to whatever tier your remaining stake (if any) earns.
+**Month 1 — Evaluating the ROI**
+
+You've run 2,000 inference seconds this month. With your 10% discount, you paid $1.80 instead of $2.00. You saved $0.20.
+
+You decide to stake more — up to 10,000 AIC total. Your discount jumps to 20%. Now you save $0.40 per 2,000 seconds. At 12 months, that's $4.80 back from the staking alone — and your original 10,000 AIC is still there, still yours.
+
+**6 months in — The compounding effect**
+
+You're building a product on top of the WebAI3 API. You're running 50,000+ inference seconds per month. You've staked 200,000 AIC to hit the 50% discount tier. Your monthly bill is $25 instead of $50. You're saving $300/year.
+
+Your staked AIC is worth more than when you staked it, because more developers are doing the same thing — staking to reduce costs, buying AIC to unlock Premium, paying with AIC and burning it. Supply is lower. Demand is higher.
+
+The discount was the entry point. The staking deposit became an investment.
 
 ---
 
-## The bigger picture — why this creates a healthy economy
+## Why the economy works — and what could break it
 
-The mechanics above aren't arbitrary. They're designed so that the growth of the platform and the health of the token reinforce each other:
+The entire system is built on one assumption: **that the platform is actually useful enough that people want to use it**. If nobody's running inference, nothing else matters. No burn, no staking demand, no token utility.
 
-**More users → more AIC burned.** Every time someone pays with AIC for inference, some tokens disappear. The busier the platform gets, the more supply contracts.
+Assuming the platform does get used, here's the reinforcing loop:
 
-**Cheaper inference → more staking.** Staking cuts costs in half at the top tier. For developers and agents who run a lot of inference, this is a real financial incentive to acquire and lock AIC rather than just buying USDC each time.
+**People use the platform → some pay with AIC → supply burns.** This is the deflationary engine. It only runs when the platform runs.
 
-**More staking → less circulating supply.** Locked AIC can't be sold. A larger percentage of the supply in the staking contract means less tokens available on the open market.
+**Developers want to reduce costs → they stake AIC → supply locks up.** Every developer staking to get the 50% discount is a token that can't be sold. If 100 developers each stake 200,000 AIC, that's 20 million tokens locked — 2% of total supply — with an economic reason to stay locked as long as they keep using the platform.
 
-**Less circulating supply + growing demand → upward price pressure.** As the platform grows, AIC demand comes from new users trying to access Standard/Premium models and from developers trying to reduce their costs through staking.
+**New users need AIC to access good models → they buy AIC → demand rises.** Standard and Premium access require AIC. A new user who wants the best models has to acquire AIC first. This isn't a paywall — it's aligned incentives. The people who can afford to use the best models are also contributing to the token economy.
 
-**Higher AIC price → existing stakers benefit more.** A staker with 50,000 AIC gets the same 35% discount whether AIC is at $0.01 or $0.10. But their 50,000 AIC is worth more. The staking deposit becomes an appreciating asset, not just a key to a cheaper rate.
+**Less circulating supply + more demand → upward price pressure.** As the platform grows and burn accumulates, there's less AIC available to buy at each price level. Combined with growing demand, this creates the conditions for price appreciation — not guaranteed, but structurally supported.
 
-This is the loop the token economy is built on:
+**Higher AIC price → stakers benefit.** A developer who staked 200,000 AIC at $0.01 is holding $2,000 of staked tokens. If the token is at $0.05, that's $10,000. The discount they're getting on inference is still the same 50% — but the deposit backing it is worth five times more. The staking position becomes an appreciating asset.
 
-```
-Use the platform → burn AIC → supply decreases
-Stake AIC → inference is cheaper → more platform usage
-More usage → more burn → more staking incentive
-```
-
-None of this is guaranteed — token economies can fail if the platform doesn't grow, if the discount isn't compelling enough, or if the AIC price collapses and staking doesn't feel worth it. But the design is intentional: every mechanic points in the same direction.
+This loop doesn't require anything exotic — just consistent platform usage and a reasonable exchange rate for AIC. It can break if the platform fails to retain users, if the discount tiers aren't compelling enough to justify staking, or if a large holder dumps supply faster than burn can absorb it. These are real risks, and it would be dishonest not to name them. But the design minimizes each one: the discount is substantial (50% is real money at scale), the burn is perpetual (it never stops as long as the platform runs), and the access gating creates a floor of demand.
 
 ---
 
 ## Current status
 
-The USDC payment flow is live. The staking contract, native AIC payments, model access gating, and burn mechanics are all planned for deployment after the presale closes and liquidity is established.
+Everything in this doc describes the intended design. Here's where things stand right now:
 
 | Feature | Status |
 |---|---|
-| USDC payments | Live |
-| Staking discounts | Planned |
-| AIC as payment currency | Planned (requires token upgrade) |
-| Burn-on-use mechanic | Planned |
-| Model access tiers | Planned |
-| On-chain AIC/USDC price (TWAP) | After DEX liquidity launches |
+| USDC payments via x402 | **Live** |
+| Staking contract (`AICStak.sol`) | Planned — deploys after presale close |
+| Server-side staking discount | Planned |
+| AIC as direct payment currency | Planned — requires minor token upgrade |
+| Burn-on-use (20% of AIC payments) | Planned |
+| Model access tier enforcement | Planned |
+| On-chain AIC/USDC price feed (TWAP) | After DEX liquidity pool launches |
 
-Technical implementation details — contract interfaces, API flows, code — are in [AIC Integration](/docs/app/aic-integration).
+The x402 USDC payment flow is running in production. The AIC layer is being built on top of it. Everything described above will be live before or shortly after TGE.
+
+For the full technical implementation — smart contract interfaces, API flow diagrams, code snippets, and env vars — see [AIC Integration](/docs/app/aic-integration).
