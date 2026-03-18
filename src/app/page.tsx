@@ -9,28 +9,28 @@ export const metadata: Metadata = {
 
 const sections = [
   {
-    title: "Overview",
+    title: "User Guide",
     description:
-      "Platform introduction, system architecture, and how all four projects integrate with each other.",
+      "Plain-English guides for presale buyers, token holders, and inference app users.",
     icon: FileText,
-    href: "/docs/overview/introduction",
-    items: ["Introduction", "Architecture"],
+    href: "/docs/users/introduction",
+    items: ["What is WebAI3?", "AIC Token", "Presale Guide", "Claiming Tokens", "Staking & Discounts", "Using the App"],
+  },
+  {
+    title: "Developer Reference",
+    description:
+      "Full technical specs for smart contracts, the presale system, fund routing, and the inference payment pipeline.",
+    icon: Cpu,
+    href: "/docs/developers/architecture",
+    items: ["Architecture", "AIC Contract", "Presale System", "Fund Routing", "Token ↔ App", "Inference Pipeline"],
   },
   {
     title: "Token (AIC)",
     description:
-      "Tokenomics, technical specification, presale mechanics, and post-presale on-chain operations.",
+      "Tokenomics, governance, presale mechanics, vault policies, and contract deployment.",
     icon: Coins,
-    href: "/docs/token/tokenomics",
-    items: ["Tokenomics", "Technical Spec", "Presale Architecture", "Post-Presale Ops", "Deployment"],
-  },
-  {
-    title: "Inference App",
-    description:
-      "The webai3_web inference platform — x402 payment protocol, AIC token integration, and local development.",
-    icon: Cpu,
-    href: "/docs/app/overview",
-    items: ["Platform Overview", "AIC Integration", "Local Testing"],
+    href: "/docs/developers/aic-token-contract",
+    items: ["Token Contract", "Presale System", "Fund Routing & Vaults", "Deployment"],
   },
   {
     title: "Operations",
@@ -63,14 +63,14 @@ export default function Home() {
           </p>
           <div className="flex items-center gap-3 mt-8">
             <Link
-              href="/docs/overview/introduction"
+              href="/docs/users/introduction"
               className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--foreground)] text-[var(--background)] text-sm font-semibold rounded-[var(--radius-md)] hover:opacity-90 transition-opacity"
             >
               Get started
               <ArrowRight size={14} />
             </Link>
             <Link
-              href="/docs/token/presale-architecture"
+              href="/docs/developers/presale-system"
               className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--muted)] text-[var(--foreground)] text-sm font-medium rounded-[var(--radius-md)] hover:bg-[var(--secondary)] transition-colors border border-[var(--border)]"
             >
               Presale architecture
@@ -127,12 +127,12 @@ export default function Home() {
           <h2 className="text-sm font-semibold text-[var(--foreground)] mb-4">Quick reference</h2>
           <div className="grid sm:grid-cols-3 gap-3">
             {[
-              { label: "Presale phases", href: "/docs/token/presale-architecture", sub: "7-phase fund-driven schedule" },
-              { label: "Tokenomics", href: "/docs/token/tokenomics", sub: "1B AIC fixed supply" },
-              { label: "x402 payments", href: "/docs/app/overview", sub: "USDC per inference" },
-              { label: "Post-presale ops", href: "/docs/token/post-presale-operations", sub: "Finalize → liquidity → claims" },
-              { label: "Deploy tutorial", href: "/docs/token/deployment-tutorial", sub: "Sepolia deployment guide" },
-              { label: "AIC staking discounts", href: "/docs/app/aic-integration", sub: "Inference rate tiers" },
+              { label: "Presale phases", href: "/docs/developers/presale-system", sub: "7-phase fund-driven schedule" },
+              { label: "Tokenomics", href: "/docs/users/aic-token", sub: "1B AIC fixed supply" },
+              { label: "x402 payments", href: "/docs/developers/inference-pipeline", sub: "USDC per inference" },
+              { label: "Fund routing & vaults", href: "/docs/developers/fund-routing", sub: "Finalize → liquidity → claims" },
+              { label: "Deploy tutorial", href: "/docs/developers/deployment", sub: "Sepolia deployment guide" },
+              { label: "AIC staking discounts", href: "/docs/users/staking-discounts", sub: "Inference rate tiers" },
             ].map((link) => (
               <Link
                 key={link.href}
