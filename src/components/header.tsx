@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { ExternalLink, Menu, X, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navigation } from "@/lib/docs";
+import { SearchButton } from "@/components/search";
 
 function ThemeToggle() {
   const [isDark, setIsDark] = useState(true);
@@ -119,6 +120,9 @@ export function Header({ currentPath }: HeaderProps) {
               Docs
             </span>
           </Link>
+
+          {/* Search */}
+          <SearchButton />
 
           {/* Spacer */}
           <div className="flex-1" />

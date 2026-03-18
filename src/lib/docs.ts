@@ -22,6 +22,7 @@ export const navigation: NavSection[] = [
       { title: "Tokenomics", href: "/docs/token/tokenomics" },
       { title: "Technical Spec", href: "/docs/token/technical-spec" },
       { title: "Presale Architecture", href: "/docs/token/presale-architecture" },
+      { title: "AIC Token — Deep Dive", href: "/docs/token/aic-token-mechanism" },
       { title: "Post-Presale Operations", href: "/docs/token/post-presale-operations" },
       { title: "Deployment Tutorial", href: "/docs/token/deployment-tutorial" },
     ],
@@ -39,6 +40,14 @@ export const navigation: NavSection[] = [
     title: "Operations",
     items: [
       { title: "Pre-Release Checklist", href: "/docs/operations/pre-release" },
+    ],
+  },
+  {
+    title: "Devlog",
+    items: [
+      { title: "Landing App Overhaul — Mar 2026", href: "/docs/devlog/landing-overhaul-mar-2026" },
+      { title: "Fix Plan: Hardcoded Prices", href: "/docs/devlog/hardcoded-prices-fix" },
+      { title: "Landing: Prices Fix & Live Phase", href: "/docs/devlog/landing-live-phase-mar-2026" },
     ],
   },
 ];
