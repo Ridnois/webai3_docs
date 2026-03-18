@@ -31,6 +31,7 @@ export const navigation: NavSection[] = [
     items: [
       { title: "Overview", href: "/docs/app/overview" },
       { title: "AIC Integration", href: "/docs/app/aic-integration" },
+      { title: "AIC in the Inference App", href: "/docs/app/token-economy" },
       { title: "Local Testing", href: "/docs/app/local-testing" },
     ],
   },
