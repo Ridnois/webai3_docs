@@ -1,262 +1,193 @@
 ---
-title: Token Economy in the Inference App
-description: How AIC integrates into the inference platform — staking discounts, native token payments, burn mechanics, and the economic flywheel that connects token holders to inference demand.
+title: AIC in the Inference App
+description: How holding and staking AIC makes every AI request cheaper, unlocks better models, and creates a self-reinforcing economy where using the platform benefits every token holder.
 section: Inference App
 order: 3
 ---
 
-## The Problem with Pure USDC Payments
+## The short version
 
-The baseline inference app settles every request in USDC at a flat rate of `$0.001 / second`. This works for anonymous users who just want to run a model, but it creates no reason to hold AIC. Every buyer from the presale has tokens that — without this integration — sit idle after the TGE.
+AIC is the native token of the WebAI3 ecosystem. In the inference app, it does three concrete things for you:
 
-The token economy solves this by making AIC ownership and usage **measurably cheaper** than paying in stablecoin, and by creating a compounding reason to stake rather than sell.
+1. **Stake it → pay less for every AI request.** Lock AIC in the staking contract and the app automatically charges you a lower rate on every inference — whether you pay in USDC or AIC.
+2. **Use it to pay directly → burn some of it in the process.** When you pay with AIC instead of USDC, a portion of those tokens is destroyed forever. Less supply, same demand — that's good for everyone holding AIC.
+3. **Hold it → get access to better models.** Some of the more capable AI models are gated behind an AIC balance. You don't need to do anything special — just hold AIC in your connected wallet.
 
----
-
-## Payment Modes
-
-There are two ways to pay for inference in the app.
-
-### Mode 1 — USDC (default)
-
-The standard x402 flow. The server issues an HTTP 402 challenge, the client signs an EIP-3009 `TransferWithAuthorization` message, and the facilitator settles the on-chain USDC transfer before inference runs. No AIC is involved.
-
-**Cost example** — a text-to-image request at 10 seconds:
-
-```
-base rate:    $0.001000 / sec
-duration:     10 seconds
-cost:         $0.0100 USDC
-```
-
-### Mode 2 — AIC (native token payment)
-
-Users with AIC in their wallet can opt to pay in the native token. AIC implements EIP-2612 (`permit`) and will be upgraded to support EIP-3009 (`transferWithAuthorization`) to keep the payment path uniform with USDC.
-
-The server includes two entries in the `accepts[]` array of the 402 challenge — one for USDC, one for AIC. The client picks its preferred asset and signs the corresponding authorization.
-
-**AIC pricing:** AIC is not a stablecoin. The server converts the USD cost to an AIC amount using an operator-configured rate (`AIC_USDC_RATE`) initially, graduating to a Uniswap v3 on-chain TWAP once the AIC/USDC pool is live.
-
-```
-usdc cost:          $0.0100
-aic/usdc rate:      $0.10 per AIC (example)
-aic amount charged: 0.10 AIC
-```
-
-### Burn-on-use
-
-When a user pays in AIC, the received tokens are split:
-
-| Portion | Destination |
-|---|---|
-| `burnBps` (e.g. 20%) | Burned permanently (`token.burn()`) |
-| Remainder | Protocol treasury |
-
-At 20% burn: every $1 of inference value paid in AIC permanently removes $0.20 of token supply. Burn rate is controlled by the `AIC_BURN_BPS` env var (range 0–10000) and can later be governed on-chain by AIC holders.
+None of this is points, credits, or loyalty tiers in a database. Every benefit is enforced on-chain, in real time, against your actual wallet.
 
 ---
 
-## Staking
+## Why AIC in the first place?
 
-Staking is the primary incentive to hold and commit AIC long-term. Stakers lock tokens in a dedicated `AICStak.sol` contract in exchange for a lower per-second inference rate applied to every request they make.
+Without a token, the inference app is a simple vending machine: you put USDC in, you get AI output out. That works fine, but it means every dollar you spend on inference is gone — there's no reason to stay, no incentive to participate in the ecosystem, and no connection between your usage and the protocol's growth.
 
-### How staking works
+AIC changes the relationship. When you hold and stake AIC:
 
-```
-1. User calls AICStak.stake(amount)
-   → AIC is transferred from wallet to staking contract
-   → stakedBalance(userAddress) increases
+- Your inference costs go down the longer you stay
+- The tokens you spend on AI requests don't just move to someone else — a portion disappear from existence, which benefits everyone who holds the rest
+- You get access to better models that casual users can't touch
+- You have a say in how the protocol evolves (governance is built into the token)
 
-2. User makes an inference request
-   → Server reads stakedBalance(userAddress) via viem
-   → Server computes discounted rate from the staking tier table
-   → Discounted rate applied to the 402 challenge amount
+The goal is a system where **heavy users of the platform are also the people most incentivized to hold and stake the token**, and where the token becomes more valuable precisely because the platform gets used more.
 
-3. User calls AICStak.unstake(amount)
-   → Tokens enter a cooldown period
-   → User calls AICStak.withdraw() after cooldown
-   → AIC returns to wallet
-```
+---
 
-The server is the authoritative source — discount is computed on the API side using the staked balance read at request time, not trusted input from the client.
+## How paying for inference works
 
-### Discount tiers
+Every AI request costs a small amount of compute time — measured in seconds. The default rate is `$0.001 per second`. A typical text-to-image request takes about 10 seconds, so it costs roughly **$0.01**.
 
-| Staked AIC | Discount | Effective rate (base $0.001/s) |
-|---|---|---|
-| 0 | 0% | $0.001000 / sec |
-| ≥ 1,000 | 10% | $0.000900 / sec |
-| ≥ 10,000 | 20% | $0.000800 / sec |
-| ≥ 50,000 | 35% | $0.000650 / sec |
-| ≥ 200,000 | 50% | $0.000500 / sec |
+You can pay in two ways.
 
-The discount applies regardless of which payment method the user chooses (USDC or AIC). Staking reduces the USD-equivalent cost — it just means fewer USDC or fewer AIC tokens are charged per request.
+### Pay with USDC
 
-### Concrete savings example
+USDC is a dollar-pegged stablecoin. You always know exactly what you're paying. Connect your wallet, approve the transaction, and the inference runs. Clean and predictable.
 
-A power user running 500 inference seconds per month:
+This is the default option and works for anyone, even if they've never heard of AIC.
 
-| Staked | Rate | Monthly cost | Savings vs unstaked |
+### Pay with AIC
+
+If you hold AIC, you can choose to pay with it instead. The app calculates the USD cost of your request, converts it to the equivalent amount of AIC at the current market rate, and charges that amount from your wallet.
+
+The difference: **when you pay with AIC, 20% of those tokens are burned on the spot.** They don't go to a treasury, they don't go to anyone — they're permanently removed from the total supply. The remaining 80% goes to the protocol.
+
+This matters because the total supply of AIC is fixed at 1 billion and never increases. Every time someone pays for inference with AIC, the circulating supply shrinks a little. If usage grows, the burn compounds.
+
+---
+
+## Staking — the main lever
+
+Staking is the simplest and most direct way to get value from AIC in the app. You lock tokens into the staking contract, and from that moment on, every inference request you make is automatically cheaper.
+
+### How to stake
+
+1. Go to the Wallet panel inside the app
+2. Choose how much AIC to stake and confirm the transaction
+3. Your tokens move from your wallet to the staking contract — they're still yours, just locked
+4. Every request you make from that point will use your discounted rate automatically
+5. When you want them back, you request unstaking, wait out the cooldown, and withdraw
+
+You don't need to do anything special per request. The app reads your staked balance on-chain when you hit the API, and the price you see is already discounted.
+
+### What the discount looks like
+
+| AIC staked | Discount | Rate per second | Cost per 10s request |
 |---|---|---|---|
-| 0 | $0.001000 / sec | $0.50 | — |
-| 1,000 | $0.000900 / sec | $0.45 | $0.05 (10%) |
-| 10,000 | $0.000800 / sec | $0.40 | $0.10 (20%) |
-| 50,000 | $0.000650 / sec | $0.325 | $0.175 (35%) |
-| 200,000 | $0.000500 / sec | $0.25 | $0.25 (50%) |
+| Nothing | 0% | $0.001000 | $0.0100 |
+| 1,000 AIC | 10% | $0.000900 | $0.0090 |
+| 10,000 AIC | 20% | $0.000800 | $0.0080 |
+| 50,000 AIC | 35% | $0.000650 | $0.0065 |
+| 200,000 AIC | 50% | $0.000500 | $0.0050 |
 
-At scale (developers, agents running thousands of seconds per month), the savings become significant enough to justify acquiring and staking AIC rather than paying the flat rate indefinitely.
+Half price. That's a real, permanent reduction that applies to every single request for as long as your tokens are staked.
 
----
+### Does staking pay off?
 
-## Model Access Tiers
+It depends how much you use the platform. At 500 inference seconds per month — which isn't a lot for a developer or anyone building on top of the API — here's what the savings look like:
 
-In addition to pricing discounts, AIC balance unlocks access to more capable models. Holding AIC is enough for the Standard tier; staked AIC is required for Premium.
-
-| Tier | AIC Requirement | Examples |
+| AIC staked | Monthly cost | You save vs unstaked |
 |---|---|---|
-| Free | 0 AIC | Base Stable Diffusion, small LLMs |
-| Standard | ≥ 500 AIC held | Mid-range diffusion, mid-size LLMs |
-| Premium | ≥ 5,000 AIC staked | SDXL, large LLMs, high-quality audio |
+| 0 | $0.50 | — |
+| 1,000 | $0.45 | $0.05 |
+| 10,000 | $0.40 | $0.10 |
+| 50,000 | $0.325 | $0.175 |
+| 200,000 | $0.25 | $0.25 |
 
-"Held" checks the wallet's `balanceOf`. "Staked" checks the staking contract's `stakedBalance`. The server is the authoritative gate — client-side model lock UI is UX only.
+For an individual running occasional requests, the savings are modest. For a developer making hundreds of requests a day, or an autonomous agent running inference continuously, staking at the top tier literally cuts the operating cost in half.
 
 ---
 
-## USDC vs AIC — Side-by-Side Comparison
+## Model access tiers
 
-| | USDC | AIC |
+Not all AI models are available to everyone. The more capable models — SDXL, large language models, high-quality audio generation — require AIC to access.
+
+| Access level | What you need | What it unlocks |
 |---|---|---|
-| **Stability** | Pegged to $1 | Volatile — price fluctuates |
-| **Discount from staking** | Yes (same tiers) | Yes (same tiers) |
-| **Burn mechanics** | No | Yes (20% burned on every AIC payment) |
-| **Rate source** | Fixed $0.001/s (env var) | Converted via AIC/USDC rate (TWAP eventually) |
-| **Settlement** | EIP-3009 + facilitator | EIP-3009 (after token upgrade) + facilitator |
-| **Best for** | Casual users, agents without AIC | AIC holders wanting to reduce net cost and support deflation |
+| **Free** | Nothing — just a wallet | Base image models, small text models |
+| **Standard** | Hold ≥ 500 AIC in your wallet | Better diffusion models, mid-size LLMs |
+| **Premium** | Stake ≥ 5,000 AIC | SDXL, large LLMs, high-quality audio |
 
-**Choosing AIC is not just cheaper — it's deflationary.** Each AIC payment reduces total supply, which benefits all remaining holders, including the user making the request.
+"Hold" means the tokens can just sit in your wallet. "Stake" means they need to be locked in the staking contract.
 
----
+If you staked 5,000 AIC to hit Premium, those same tokens are also earning you a 10% discount (you'd be in the 1,000 tier — a bit above it, but the discount applies from whatever tier your staked amount falls into).
 
-## End-to-End Workflow
-
-### New user — USDC payment
-
-```
-1. Wallet connect (wagmi)
-2. SIWE sign-in → session cookie
-3. POST /api/inference/estimate
-   ← { estimatedCostUsdc: 0.010, estimatedSeconds: 10 }
-4. POST /api/inference  (no payment header)
-   ← 402 { accepts: [{ asset: USDC, amount: "10000" }] }
-5. Client signs EIP-712 TransferWithAuthorization for 0.01 USDC
-6. POST /api/inference  (with Payment-Signature header)
-   Server:
-     a. Validate + verify with facilitator
-     b. Settle on-chain USDC transfer
-     c. Run Replicate model
-     d. Upload output to R2
-     e. INSERT inference record
-   ← 200 { id, output, status }
-```
-
-### AIC holder with staked tokens
-
-```
-1. Wallet connect + SIWE sign-in
-2. User goes to Wallet panel → stakes 10,000 AIC
-   → calls AICStak.stake(10_000 * 1e18)
-   → stakedBalance(address) = 10,000
-
-3. POST /api/inference/estimate
-   Server:
-     a. readStakedAic(address) → 10,000
-     b. discountedRate(0.001, 10_000) → 0.0008
-   ← { estimatedCostUsdc: 0.008, estimatedSeconds: 10 }
-
-4. POST /api/inference  (no payment header)
-   Server builds 402 challenge with discounted amounts:
-   ← 402 {
-       accepts: [
-         { asset: USDC, amount: "8000" },   // 0.008 USDC
-         { asset: AIC,  amount: "80000000000000000" }, // 0.08 AIC at $0.10/AIC
-       ]
-     }
-
-5. Client selects AIC, signs EIP-712 TransferWithAuthorization
-6. POST /api/inference  (with Payment-Signature header)
-   Server:
-     a. Validate AIC payment payload
-     b. Verify with facilitator
-     c. Settle on-chain AIC transfer
-     d. Split: 20% burned, 80% to treasury
-     e. Run Replicate model
-     f. INSERT inference record with:
-          staked_aic_at_time = 10000
-          discount_pct = 20.00
-          effective_rate_usdc = 0.000800
-   ← 200 { id, output, status }
-```
-
-### Inference failure after settlement
-
-Settlement is irrevocable. If Replicate fails after the on-chain transfer:
-
-```
-Server:
-  c. Replicate.run() throws
-  d. INSERT inference record with status = "failed", payment_tx_hash = <hash>
-← 500 { error: "inference failed", inferenceId: <id> }
-```
-
-The payment tx hash is stored in the inference record for investigation and potential manual refund. Automatic refunds are not implemented — this is a known tradeoff of pre-settlement payment.
+The app checks your balance on-chain when you make a request. There's no registration, no approval process — the access is a direct consequence of what's in your wallet.
 
 ---
 
-## The Economic Flywheel
+## USDC vs AIC — which should you use?
 
-The three mechanics — staking discounts, AIC payments, and burn — reinforce each other:
+| | Pay with USDC | Pay with AIC |
+|---|---|---|
+| Predictability | Exact dollar amount every time | Amount varies with AIC price |
+| Staking discount | Yes — applies to both | Yes — applies to both |
+| Burn effect | No | 20% of payment destroyed permanently |
+| Best for | Casual use, low frequency | AIC holders who want to reduce net supply and support the ecosystem |
 
-```
-Presale buyers receive AIC
-         │
-         ▼
-Stake AIC in inference app
-         │
-    Lower per-request cost
-         │
-     More inference usage
-         │
-  More AIC payments accepted
-         │
-      AIC supply decreases (burn)
-         │
-  Remaining supply more scarce
-         │
-  Higher AIC/USDC rate (if demand holds)
-         │
-  Discount in USDC terms grows for stakers
-         │
-    Incentive to stake AIC grows
-         │
-         └──────────────────── (loop)
-```
+Staking discounts work the same regardless of which token you pay with. The distinction is whether you want to participate in the deflationary mechanic.
 
-The burn is the key link. Without it, AIC payments just move tokens from users to treasury — no supply pressure. With burn, every inference paid in AIC permanently removes tokens, creating a deflationary force proportional to network usage.
+If you're a long-term AIC holder, paying with AIC rather than USDC makes sense: you're spending tokens that were always going to be used anyway, and you're taking a small amount of supply off the table in the process.
 
 ---
 
-## Implementation Status
+## Seeing the full picture
+
+Here's how a user who has staked AIC experiences the app from start to finish:
+
+**First time setup**
+
+You connect your wallet and sign in. Nothing about this is different from any Web3 app. Then, from the Wallet panel, you open the staking interface, choose an amount, and confirm the transaction. Your staked balance is now on-chain. Done.
+
+**Running a request**
+
+You type a prompt or select a model. Before you confirm, the app shows you an estimated cost — this number is already your discounted price, based on your staked balance. You see `$0.0080` instead of `$0.0100` because you staked 10,000 AIC.
+
+You can choose to pay in USDC or AIC. You click confirm. The payment happens on-chain first. Then the model runs. Your output appears.
+
+If you paid with AIC: 20% of those tokens were just burned. The other 80% went to the protocol. The inference record in the app's database logs your staked balance at the time, the discount applied, and the effective rate — you can see this in your request history.
+
+**Getting tokens back**
+
+When you want to unstake, you request it from the Wallet panel. After a cooldown period, you can withdraw your AIC back to your wallet. Your discount drops back to whatever tier your remaining stake (if any) earns.
+
+---
+
+## The bigger picture — why this creates a healthy economy
+
+The mechanics above aren't arbitrary. They're designed so that the growth of the platform and the health of the token reinforce each other:
+
+**More users → more AIC burned.** Every time someone pays with AIC for inference, some tokens disappear. The busier the platform gets, the more supply contracts.
+
+**Cheaper inference → more staking.** Staking cuts costs in half at the top tier. For developers and agents who run a lot of inference, this is a real financial incentive to acquire and lock AIC rather than just buying USDC each time.
+
+**More staking → less circulating supply.** Locked AIC can't be sold. A larger percentage of the supply in the staking contract means less tokens available on the open market.
+
+**Less circulating supply + growing demand → upward price pressure.** As the platform grows, AIC demand comes from new users trying to access Standard/Premium models and from developers trying to reduce their costs through staking.
+
+**Higher AIC price → existing stakers benefit more.** A staker with 50,000 AIC gets the same 35% discount whether AIC is at $0.01 or $0.10. But their 50,000 AIC is worth more. The staking deposit becomes an appreciating asset, not just a key to a cheaper rate.
+
+This is the loop the token economy is built on:
+
+```
+Use the platform → burn AIC → supply decreases
+Stake AIC → inference is cheaper → more platform usage
+More usage → more burn → more staking incentive
+```
+
+None of this is guaranteed — token economies can fail if the platform doesn't grow, if the discount isn't compelling enough, or if the AIC price collapses and staking doesn't feel worth it. But the design is intentional: every mechanic points in the same direction.
+
+---
+
+## Current status
+
+The USDC payment flow is live. The staking contract, native AIC payments, model access gating, and burn mechanics are all planned for deployment after the presale closes and liquidity is established.
 
 | Feature | Status |
 |---|---|
-| USDC payment via x402 | Implemented |
-| Staking contract (`AICStak.sol`) | Planned |
-| Server-side staked balance read | Planned |
-| Discount tier application in pricing | Planned |
-| AIC EIP-3009 support (for payment) | Planned — requires `WebAI3Token` upgrade |
-| Dual-asset `accepts[]` in 402 challenge | Planned |
-| Burn splitter contract (`AICSplitter.sol`) | Planned |
-| Uniswap v3 TWAP for AIC/USDC rate | After liquidity pool launch |
-| Model access gating (server-side) | Planned |
+| USDC payments | Live |
+| Staking discounts | Planned |
+| AIC as payment currency | Planned (requires token upgrade) |
+| Burn-on-use mechanic | Planned |
+| Model access tiers | Planned |
+| On-chain AIC/USDC price (TWAP) | After DEX liquidity launches |
 
-Full implementation detail — code snippets, contract interfaces, env vars — in [AIC Integration](/docs/app/aic-integration).
+Technical implementation details — contract interfaces, API flows, code — are in [AIC Integration](/docs/app/aic-integration).
