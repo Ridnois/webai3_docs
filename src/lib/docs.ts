@@ -10,30 +10,27 @@ export interface NavSection {
 
 export const navigation: NavSection[] = [
   {
-    title: "Overview",
+    title: "User Guide",
     items: [
-      { title: "Introduction", href: "/docs/overview/introduction" },
-      { title: "Architecture", href: "/docs/overview/architecture" },
+      { title: "What is WebAI3?", href: "/docs/users/introduction" },
+      { title: "The AIC Token", href: "/docs/users/aic-token" },
+      { title: "Presale Guide", href: "/docs/users/presale-guide" },
+      { title: "Claiming Your Tokens", href: "/docs/users/claiming-tokens" },
+      { title: "Staking & Discounts", href: "/docs/users/staking-discounts" },
+      { title: "Using the App", href: "/docs/users/using-the-app" },
     ],
   },
   {
-    title: "Token (AIC)",
+    title: "Developer Reference",
     items: [
-      { title: "Tokenomics", href: "/docs/token/tokenomics" },
-      { title: "Technical Spec", href: "/docs/token/technical-spec" },
-      { title: "Presale Architecture", href: "/docs/token/presale-architecture" },
-      { title: "AIC Token — Deep Dive", href: "/docs/token/aic-token-mechanism" },
-      { title: "Post-Presale Operations", href: "/docs/token/post-presale-operations" },
-      { title: "Deployment Tutorial", href: "/docs/token/deployment-tutorial" },
-    ],
-  },
-  {
-    title: "Inference App",
-    items: [
-      { title: "Overview", href: "/docs/app/overview" },
-      { title: "AIC Integration", href: "/docs/app/aic-integration" },
-      { title: "AIC in the Inference App", href: "/docs/app/token-economy" },
-      { title: "Local Testing", href: "/docs/app/local-testing" },
+      { title: "System Architecture", href: "/docs/developers/architecture" },
+      { title: "AIC Token Contract", href: "/docs/developers/aic-token-contract" },
+      { title: "Presale System", href: "/docs/developers/presale-system" },
+      { title: "Fund Routing & Vaults", href: "/docs/developers/fund-routing" },
+      { title: "Token ↔ App Integration", href: "/docs/developers/token-app-integration" },
+      { title: "Inference Payment Pipeline", href: "/docs/developers/inference-pipeline" },
+      { title: "Local Development", href: "/docs/developers/local-development" },
+      { title: "Contract Deployment", href: "/docs/developers/deployment" },
     ],
   },
   {
