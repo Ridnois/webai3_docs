@@ -100,7 +100,10 @@ All 1B AIC tokens currently sit in the single admin wallet (`0xB40A959...`). Dis
   - `NEXT_PUBLIC_PRESALE_CONTRACT_ADDRESS` → mainnet presale
   - `NEXT_PUBLIC_CLAIM_MODULE_ADDRESS` → mainnet claim module
   - `NEXT_PUBLIC_USDC_ADDRESS` → `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48`
-- [ ] Set `NEXT_PUBLIC_PRESALE_CURRENT_PHASE_ID` to the active phase at launch
+- [ ] Set `NEXT_PUBLIC_PRESALE_CURRENT_PHASE_ID` as a fallback (primary source is now on-chain — see below)
+- [ ] Set `NEXT_PUBLIC_PRESALE_CONTRACT_ADDRESS` to the mainnet `WebAI3Presale` address (enables on-chain phase reads)
+- [ ] Set `NEXT_PUBLIC_CHAIN_ID=1` for mainnet
+- [ ] Set `NEXT_PUBLIC_RPC_URL` to a production RPC endpoint (Alchemy, Infura, etc.) — do not rely on public nodes under load
 
 **Presale UX**
 
@@ -252,10 +255,12 @@ POST-LAUNCH (first 24h)
 | Variable | Required | Notes |
 |---|---|---|
 | `NEXT_PUBLIC_PRESALE_TOKEN_ADDRESS` | Yes | Mainnet AIC token |
-| `NEXT_PUBLIC_PRESALE_CONTRACT_ADDRESS` | Yes | Mainnet presale |
+| `NEXT_PUBLIC_PRESALE_CONTRACT_ADDRESS` | Yes | Mainnet presale — also enables on-chain phase reads |
 | `NEXT_PUBLIC_CLAIM_MODULE_ADDRESS` | Yes | Mainnet claim module |
 | `NEXT_PUBLIC_USDC_ADDRESS` | Yes | `0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48` |
-| `NEXT_PUBLIC_PRESALE_CURRENT_PHASE_ID` | Yes | Active phase at launch |
+| `NEXT_PUBLIC_PRESALE_CURRENT_PHASE_ID` | No | Fallback phase ID if on-chain read fails. Set to `phase-1` at launch |
+| `NEXT_PUBLIC_CHAIN_ID` | No | Default `1`. Set explicitly to `1` for mainnet |
+| `NEXT_PUBLIC_RPC_URL` | Yes (production) | Alchemy/Infura endpoint — do not rely on public nodes under load |
 | `NEXT_PUBLIC_NETWORK_NAME` | Yes | `Ethereum Mainnet` |
 | `NEXT_PUBLIC_EXPLORER_BASE_URL` | Yes | `https://etherscan.io` |
 

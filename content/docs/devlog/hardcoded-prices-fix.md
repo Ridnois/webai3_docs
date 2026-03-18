@@ -1,9 +1,11 @@
 ---
 title: "Fix Plan: Hardcoded Prices in Landing App"
-description: Audit and correction plan for price strings that are hardcoded instead of driven by presale-config.ts.
+description: Audit and correction plan for price strings that are hardcoded instead of driven by presale-config.ts. Implemented in commit 1bf3574.
 section: Devlog
 order: 2
 ---
+
+> **Status: Implemented** — All items below were addressed in commit `1bf3574`. See [Landing: Prices Fix & Live On-Chain Phase](/docs/devlog/landing-live-phase-mar-2026) for the implementation notes.
 
 ## Problem
 

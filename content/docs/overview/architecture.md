@@ -34,7 +34,7 @@ MarketingVault
 | From | To | Mechanism |
 |---|---|---|
 | `webai3-landing` | `webai3_web` | URL link ("Launch App") |
-| `webai3-landing` | `webai3_token` | On-chain reads (presale state, phase info) |
+| `webai3-landing` | `webai3_token` | On-chain reads (`WebAI3Presale.getActivePhase()` via viem server component) |
 | `webai3_web` | `webai3_token` | On-chain reads (AIC balance, staked amount) |
 | `webai3_web` | x402 facilitator | HTTPS API (`/verify`, `/settle`) |
 | `webai3_web` | Replicate | HTTPS API (model inference) |
@@ -84,7 +84,11 @@ Next.js 16 app with App Router. Key layers:
 
 ## webai3-landing — Presale Frontend
 
-Static Next.js 16 app. No backend, no database. All presale configuration comes from `NEXT_PUBLIC_*` env vars and on-chain reads via wagmi v3 + viem.
+Static Next.js 16 app. No backend, no database. Presale configuration is driven by `NEXT_PUBLIC_*` env vars with live on-chain overrides.
+
+**Active phase** is read from `WebAI3Presale.getActivePhase()` at request time via viem in a server component (`src/lib/chain-phase.ts`). React `cache()` deduplicates the RPC call to one per page render. If the contract address is not configured, the app falls back to the `NEXT_PUBLIC_PRESALE_CURRENT_PHASE_ID` env var.
+
+All phase pricing and listing target strings are computed from `presale-config.ts` — nothing is hardcoded.
 
 The presale checkout currently redirects to an external URL (`NEXT_PUBLIC_PRESALE_CHECKOUT_URL`). A native wagmi-based inline flow is planned.
 
