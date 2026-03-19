@@ -46,6 +46,7 @@ export const navigation: NavSection[] = [
       { title: "Fix Plan: Hardcoded Prices", href: "/docs/devlog/hardcoded-prices-fix" },
       { title: "Landing: Prices Fix & Live Phase", href: "/docs/devlog/landing-live-phase-mar-2026" },
       { title: "Landing: Product-First Metadata", href: "/docs/devlog/landing-metadata-mar-2026" },
+      { title: "Landing: Internationalization Plan", href: "/docs/devlog/landing-i18n-plan" },
     ],
   },
 ];
